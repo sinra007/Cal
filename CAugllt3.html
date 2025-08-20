@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Percentage Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            touch-action: manipulation;
+        }
+          
+        .calculator {
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+        }
+          
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 28px;
+            text-align: center;
+        }
+          
+        .input-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+          
+        #numberInput {
+            width: 100%;
+            padding: 18px 85px 18px 18px;
+            font-size: 26px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            text-align: right;
+            outline: none;
+            transition: border-color 0.3s;
+            background-color: #f8f9fa;
+            cursor: default;
+        }
+          
+        #numberInput:focus {
+            border-color: #3498db;
+        }
+          
+        .percent-display {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #3498db;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            user-select: none;
+            min-width: 70px;
+            text-align: center;
+        }
+          
+        .percent-display:hover {
+            background-color: #2980b9;
+        }
+          
+        .percent-edit {
+            display: none;
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 80px;
+        }
+          
+        #percentInput {
+            width: 100%;
+            padding: 8px;
+            font-size: 18px;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            text-align: center;
+            outline: none;
+        }
+          
+        .results {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+          
+        .result {
+            font-size: 22px;
+            margin-bottom: 12px;
+            color: #2c3e50;
+        }
+          
+        .rounded {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+          
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+          
+        button {
+            padding: 16px;
+            font-size: 18px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            flex: 1;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+          
+        #acButton {
+            background-color: #e74c3c;
+            color: white;
+        }
+          
+        #acButton:hover {
+            background-color: #c0392b;
+        }
+          
+        #historyButton {
+            background-color: #2ecc71;
+            color: white;
+        }
+          
+        #historyButton:hover {
+            background-color: #27ae60;
+        }
+          
+        .history {
+            background-color: #f9f9f9;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+            max-height: 250px;
+            overflow-y: auto;
+            display: none;
+            border: 1px solid #eee;
+            position: relative;
+        }
+          
+        .history h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-align: center;
+            padding-right: 30px;
+        }
+          
+        #clearHistory {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: #e74c3c;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+          
+        #historyList {
+            list-style-type: none;
+        }
+          
+        #historyList li {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            color: #2c3e50;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+          
+        #historyList li:last-child {
+            border-bottom: none;
+        }
+          
+        .history-value {
+            font-weight: bold;
+            color: #3498db;
+        }
+          
+        .keyboard {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+          
+        .key {
+            padding: 18px 5px;
+            font-size: 24px;
+            background-color: #f1f2f6;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            touch-action: manipulation;
+        }
+          
+        .key:hover {
+            background-color: #dfe4ea;
+        }
+          
+        .key.operator {
+            background-color: #ffeaa7;
+        }
+          
+        .key.operator:hover {
+            background-color: #fdcb6e;
+        }
+          
+        .key.special {
+            background-color: #74b9ff;
+            color: white;
+        }
+          
+        .key.special:hover {
+            background-color: #0984e3;
+        }
+        
+        /* Focus prevention for buttons */
+        button:focus, .key:focus {
+            outline: none;
+        }
+        
+        /* Input field styling for readonly state */
+        .readonly-input {
+            background-color: #f8f9fa;
+            cursor: default;
+            user-select: none;
+        }
+          
+        @media (max-width: 480px) {
+            .calculator {
+                padding: 15px;
+                max-width: 95vw;
+            }
+              
+            h1 {
+                font-size: 24px;
+            }
+              
+            #numberInput {
+                font-size: 22px;
+                padding: 15px 75px 15px 15px;
+            }
+              
+            .percent-display {
+                font-size: 18px;
+                padding: 6px 12px;
+                min-width: 60px;
+            }
+              
+            button, .key {
+                font-size: 16px;
+                padding: 14px;
+            }
+              
+            .result {
+                font-size: 20px;
+            }
+              
+            .rounded {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h1>Percentage Calculator</h1>
+        <div class="input-container">
+            <input type="text" id="numberInput" placeholder="Enter a number" readonly inputmode="none" class="readonly-input">
+            <div class="percent-display" id="percentDisplay">45%</div>
+            <div class="percent-edit" id="percentEdit">
+                <input type="number" id="percentInput" min="0" max="100" inputmode="decimal">
+            </div>
+        </div>
+          
+        <div class="results">
+            <div class="result" id="result">Result: </div>
+            <div class="rounded" id="rounded">Rounded: </div>
+        </div>
+          
+        <div class="buttons">
+            <button id="acButton">AC</button>
+            <button id="historyButton">History</button>
+        </div>
+          
+        <div class="history" id="historyContainer">
+            <h3>Calculation History</h3>
+            <button id="clearHistory">❌</button>
+            <ul id="historyList"></ul>
+        </div>
+          
+        <div class="keyboard">
+            <button class="key" data-value="7">7</button>
+            <button class="key" data-value="8">8</button>
+            <button class="key" data-value="9">9</button>
+            <button class="key operator" data-value="/">/</button>
+              
+            <button class="key" data-value="4">4</button>
+            <button class="key" data-value="5">5</button>
+            <button class="key" data-value="6">6</button>
+            <button class="key operator" data-value="*">×</button>
+              
+            <button class="key" data-value="1">1</button>
+            <button class="key" data-value="2">2</button>
+            <button class="key" data-value="3">3</button>
+            <button class="key operator" data-value="-">-</button>
+              
+            <button class="key" data-value="0">0</button>
+            <button class="key" data-value=".">.</button>
+            <button class="key special" data-value="back">⌫</button>
+            <button class="key operator" data-value="+">+</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const numberInput = document.getElementById('numberInput');
+            const resultDisplay = document.getElementById('result');
+            const roundedDisplay = document.getElementById('rounded');
+            const percentDisplay = document.getElementById('percentDisplay');
+            const percentEdit = document.getElementById('percentEdit');
+            const percentInput = document.getElementById('percentInput');
+            const acButton = document.getElementById('acButton');
+            const historyButton = document.getElementById('historyButton');
+            const historyContainer = document.getElementById('historyContainer');
+            const historyList = document.getElementById('historyList');
+            const clearHistoryBtn = document.getElementById('clearHistory');
+            const keys = document.querySelectorAll('.key');
+              
+            let currentPercent = 45;
+            let history = [];
+            let currentValue = '';
+            
+            const keySound = new Audio('sounds/keypress.mp3'); // Replace 'keypress.mp3' with your actual sound file name
+              
+            // Update the calculation result
+            function updateResult() {
+                const inputValue = numberInput.value || '0';
+                let num;
+                  
+                try {
+                    num = eval(inputValue);
+                    if (isNaN(num)) num = 0;
+                } catch {
+                    num = 0;
+                }
+                  
+                const total = num + (num * currentPercent / 100);
+                const roundedValue = Math.round(total);
+                  
+                resultDisplay.textContent = `Result: ${total.toFixed(2)}`;
+                roundedDisplay.textContent = `Rounded: ${roundedValue}`;
+                  
+                // Store the current value for potential history addition
+                currentValue = inputValue;
+            }
+              
+            // Add current calculation to history
+            function addToHistory() {
+                if (currentValue && currentValue !== '0') {
+                    const num = eval(currentValue);
+                    const total = num + (num * currentPercent / 100);
+                    const roundedValue = Math.round(total);
+                      
+                    history.push({
+                        num: currentValue,
+                        percent: currentPercent,
+                        total: total.toFixed(2),
+                        rounded: roundedValue
+                    });
+                      
+                    updateHistoryDisplay();
+                }
+            }
+              
+            // Update history list display
+            function updateHistoryDisplay() {
+                historyList.innerHTML = '';
+                  
+                if (history.length === 0) {
+                    const li = document.createElement('li');
+                    li.textContent = 'No history yet';
+                    li.style.color = '#999';
+                    li.style.justifyContent = 'center';
+                    historyList.appendChild(li);
+                    return;
+                }
+                  
+                history.slice().reverse().forEach(item => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <span>${item.num} + ${item.percent}%</span>
+                        <span class="history-value">${item.total} (${item.rounded})</span>
+                    `;
+                    historyList.appendChild(li);
+                });
+            }
+              
+            // Clear input and results
+            function allClear() {
+                addToHistory(); // Add current value to history before clearing
+                numberInput.value = '';
+                resultDisplay.textContent = 'Result: ';
+                roundedDisplay.textContent = 'Rounded: ';
+                currentValue = '';
+                updateResult();
+            }
+              
+            // Clear history
+            function clearHistory() {
+                history = [];
+                updateHistoryDisplay();
+            }
+              
+            // Toggle history visibility
+            function toggleHistory() {
+                historyContainer.style.display = historyContainer.style.display === 'none' ? 'block' : 'none';
+            }
+              
+            // Toggle percent editor
+            function togglePercentEdit() {
+                if (percentEdit.style.display === 'block') {
+                    // Save the new percentage value
+                    const newPercent = parseFloat(percentInput.value);
+                    if (!isNaN(newPercent) && newPercent >= 0 && newPercent <= 100) {
+                        currentPercent = newPercent;
+                        percentDisplay.textContent = `${currentPercent}%`;
+                    }
+                    percentEdit.style.display = 'none';
+                    percentDisplay.style.display = 'block';
+                    updateResult();
+                } else {
+                    // Show the editor
+                    percentInput.value = currentPercent;
+                    percentDisplay.style.display = 'none';
+                    percentEdit.style.display = 'block';
+                    percentInput.focus();
+                    percentInput.select();
+                }
+            }
+              
+            // Event listeners
+            // Removed unused 'input' listener since value changes are programmatic and don't trigger it
+              
+            // Prevent focus on input field
+            numberInput.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+                this.blur();
+            });
+            
+            numberInput.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                this.blur();
+            });
+              
+            percentDisplay.addEventListener('click', togglePercentEdit);
+              
+            percentInput.addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') {
+                    togglePercentEdit();
+                } else if (e.key === 'Escape') {
+                    percentEdit.style.display = 'none';
+                    percentDisplay.style.display = 'block';
+                }
+            });
+              
+            percentInput.addEventListener('blur', function() {
+                percentEdit.style.display = 'none';
+                percentDisplay.style.display = 'block';
+            });
+              
+            acButton.addEventListener('click', allClear);
+              
+            historyButton.addEventListener('click', toggleHistory);
+              
+            clearHistoryBtn.addEventListener('click', clearHistory);
+              
+            // Keyboard input
+            keys.forEach(key => {
+                // Changed to 'touchend' for better responsiveness on touch devices, falling back to 'click' for mouse
+                const eventType = 'ontouchend' in document.documentElement ? 'touchend' : 'click';
+                key.addEventListener(eventType, () => {
+                    const value = key.getAttribute('data-value');
+                    
+                    // Play sound and provide haptic feedback
+                    keySound.currentTime = 0;
+                    keySound.play();
+                    if (navigator.vibrate) {
+                        navigator.vibrate(10); // Light haptic feedback (10ms vibration)
+                    }
+                      
+                    if (value === 'back') {
+                        numberInput.value = numberInput.value.slice(0, -1);
+                    } else {
+                        numberInput.value += value;
+                    }
+                      
+                    updateResult();
+                });
+                
+                // Removed preventDefault on mousedown/touchstart for keys, as it can interfere with event propagation and cause intermittent failures or delays
+                // Instead, prevent focus by blurring if focused (though buttons focus on click, this handles it post-event)
+                key.addEventListener('focus', function() {
+                    this.blur();
+                });
+            });
+              
+            // Initialize
+            updateResult();
+            updateHistoryDisplay();
+        });
+    </script>
+</body>
+</html>
